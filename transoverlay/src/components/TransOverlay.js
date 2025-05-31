@@ -58,12 +58,12 @@ const TransOverlay = () => {
 
   // Function to detect the language of the given text
   const detectLanguage = (text) => {
-    if (!text || text.trim().length < 3) {
+    if (!text || text.trim().length < 10) {
       return ''; // Not enough text to detect language
     }
     
     try {
-      const detectedCode = languageDetect(text);
+      const detectedCode = franc(text);
       // Return readable language name if available, otherwise the code
       return languageCodeMap[detectedCode] || detectedCode || '';
     } catch (error) {
