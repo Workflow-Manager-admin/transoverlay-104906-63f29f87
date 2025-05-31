@@ -142,8 +142,10 @@ const TransOverlay = () => {
           
           // If we have text and detected a language, translate it
           if (text && lang) {
-            const translated = translateText(text, lang, selectedLanguage);
-            setTranslatedText(translated);
+            performTranslation(text, lang, selectedLanguage)
+              .then(translated => {
+                setTranslatedText(translated);
+              });
           }
         }
       }
