@@ -1,6 +1,6 @@
-# Lightweight React Template for KAVIA
+# TransOverlay
 
-This project provides a minimal React template with a clean, modern UI and minimal dependencies.
+TransOverlay is a web application that allows users to translate text in real-time. The app features a transparent overlay screen that can be dragged and positioned over any window or text to provide instant translation capabilities.
 
 ## Features
 
