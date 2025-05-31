@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import { franc } from 'franc-min';
+import { translateText } from '../services/translationService';
 import './TransOverlay.css';
 
 /**
