@@ -43,7 +43,7 @@ const TransOverlay = () => {
     { code: 'ru', name: 'Russian' },
   ];
 
-  // Map of language codes used by language-detect to more readable forms
+  // Map of language codes used by franc to more readable forms
   const languageCodeMap = {
     'eng': 'English',
     'spa': 'Spanish',
@@ -52,7 +52,7 @@ const TransOverlay = () => {
     'ita': 'Italian',
     'jpn': 'Japanese',
     'kor': 'Korean',
-    'zho': 'Chinese',
+    'cmn': 'Chinese',
     'rus': 'Russian',
   };
 
