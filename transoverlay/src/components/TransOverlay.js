@@ -16,7 +16,6 @@ const TransOverlay = () => {
   const [originalText, setOriginalText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('es'); // Default to Spanish
-  const [isDragging, setIsDragging] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   
   const overlayRef = useRef(null);

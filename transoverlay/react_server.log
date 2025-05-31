@@ -66,3 +66,4 @@ src/components/TransOverlay.js
   Line 19:10:  'isDragging' is assigned a value but never used  no-unused-vars
 
 webpack compiled with 1 warning
+Compiling...
