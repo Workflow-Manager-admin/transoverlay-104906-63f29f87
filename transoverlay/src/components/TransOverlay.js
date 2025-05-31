@@ -81,14 +81,8 @@ const TransOverlay = () => {
     document.removeEventListener('mouseup', handleResizeEnd);
   };
 
-  // Handle drag start
-  const handleDragStart = () => {
-    setIsDragging(true);
-  };
-
   // Handle drag end
   const handleDragEnd = (e, data) => {
-    setIsDragging(false);
     setPosition({ x: data.x, y: data.y });
   };
 
@@ -139,7 +133,6 @@ const TransOverlay = () => {
     <Draggable
       handle=".trans-overlay-header"
       position={position}
-      onStart={handleDragStart}
       onStop={handleDragEnd}
       bounds="parent"
     >

@@ -67,3 +67,35 @@ src/components/TransOverlay.js
 
 webpack compiled with 1 warning
 Compiling...
+Failed to compile.
+
+[eslint] 
+src/components/TransOverlay.js
+  Line 86:5:  'setIsDragging' is not defined  no-undef
+  Line 91:5:  'setIsDragging' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
+ERROR in [eslint] 
+src/components/TransOverlay.js
+  Line 86:5:  'setIsDragging' is not defined  no-undef
+  Line 91:5:  'setIsDragging' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
+
+webpack compiled with 1 error
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/components/TransOverlay.js
+  Line 136:16:  'handleDragStart' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
+ERROR in [eslint] 
+src/components/TransOverlay.js
+  Line 136:16:  'handleDragStart' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
+
+webpack compiled with 1 error
+Compiling...
