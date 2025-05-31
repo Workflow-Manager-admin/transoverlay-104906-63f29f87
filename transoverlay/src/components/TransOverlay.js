@@ -76,13 +76,31 @@ const TransOverlay = () => {
     }
   };
 
-  // Simulated translation function - In a real app, this would call a translation API
-  const translateText = (text, sourceLang, targetLang) => {
-    // For demo purposes, we're just appending the language code to the text
-    // In a real application, this would call a translation API
-    if (!text) return '';
+  // Real translation function that uses our translation service
+  const performTranslation = async (text, sourceLang, targetLang) => {
+    if (!text || text.trim() === '') return '';
     
-    return `[${sourceLang} → ${targetLang}] ${text} (translated)`;
+    // Reset previous errors
+    setTranslationError(null);
+    setIsTranslating(true);
+    
+    try {
+      const result = await translateText(text, sourceLang, targetLang);
+      setTranslationService(result.service);
+      
+      if (result.success) {
+        return result.translatedText;
+      } else {
+        setTranslationError("Translation failed: " + (result.error || "Unknown error"));
+        return `[Error: Could not translate text]`;
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      setTranslationError("Translation failed: " + error.message);
+      return `[Error: Could not translate text]`;
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   // Extract text from elements under the mouse pointer
