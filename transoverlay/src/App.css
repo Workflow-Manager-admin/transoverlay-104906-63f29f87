@@ -1,6 +1,9 @@
 :root {
   --kavia-orange: #E87A41;
   --kavia-dark: #1A1A1A;
+  --primary-color: #2196F3;
+  --secondary-color: #FFFFFF;
+  --accent-color: #4CAF50;
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --border-color: rgba(255, 255, 255, 0.1);
