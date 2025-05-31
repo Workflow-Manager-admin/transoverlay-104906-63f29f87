@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-import languageDetect from 'language-detect';
+import { franc } from 'franc-min';
 import './TransOverlay.css';
 
 /**
