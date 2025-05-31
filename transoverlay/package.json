@@ -4,9 +4,11 @@
   "private": true,
   "description": "A transparent, draggable overlay for real-time text translation",
   "dependencies": {
+    "language-detect": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
+    "react-rnd": "^10.5.2",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
