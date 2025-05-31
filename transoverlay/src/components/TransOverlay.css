@@ -88,6 +88,43 @@
   font-style: italic;
 }
 
+.translated-text.loading {
+  color: #888;
+}
+
+.loading-indicator {
+  display: inline-flex;
+  align-items: center;
+}
+
+.loading-indicator::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  border: 2px solid rgba(33, 150, 243, 0.3);
+  border-radius: 50%;
+  border-top-color: rgba(33, 150, 243, 1);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.translation-source {
+  font-size: 10px;
+  color: #888;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.translation-error {
+  font-size: 11px;
+  color: #e74c3c;
+  margin-top: 4px;
+}
+
 .hover-info {
   background-color: rgba(255, 255, 255, 0.9);
   color: #333;
