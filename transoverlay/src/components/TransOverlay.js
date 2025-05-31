@@ -27,6 +27,9 @@ const TransOverlay = () => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translationError, setTranslationError] = useState(null);
+  const [translationService, setTranslationService] = useState('');
   
   const overlayRef = useRef(null);
   const hoverTimerRef = useRef(null);
