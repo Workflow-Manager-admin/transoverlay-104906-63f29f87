@@ -363,12 +363,31 @@ const TransOverlay = () => {
               </div>
             )}
             
-            {translatedText && (
+            {/* Translation panel with loading state */}
+            {(translatedText || isTranslating) && (
               <div className="translation-panel">
                 <div className="original-text">
                   {isHovering ? hoveredText : originalText}
                 </div>
-                <div className="translated-text">{translatedText}</div>
+                {isTranslating ? (
+                  <div className="translated-text loading">
+                    <span className="loading-indicator">Translating...</span>
+                  </div>
+                ) : (
+                  <div className="translated-text">
+                    {translatedText}
+                    {translationService && !translationError && (
+                      <div className="translation-source">
+                        via {translationService}
+                      </div>
+                    )}
+                    {translationError && (
+                      <div className="translation-error">
+                        {translationError}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             
