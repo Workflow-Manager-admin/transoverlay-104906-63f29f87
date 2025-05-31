@@ -1,0 +1,114 @@
+/* TransOverlay Component Styles */
+.trans-overlay-container {
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  pointer-events: all;
+  user-select: none;
+}
+
+.trans-overlay {
+  background-color: rgba(33, 150, 243, 0.15);
+  border: 1px solid rgba(33, 150, 243, 0.6);
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+}
+
+.trans-overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  cursor: move; /* Indicates the header is draggable */
+  color: white;
+  background-color: rgba(33, 150, 243, 0.7);
+  border-radius: 4px 4px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.trans-overlay-body {
+  flex: 1;
+  padding: 10px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trans-overlay-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: rgba(33, 150, 243, 0.3);
+  border-radius: 0 0 4px 4px;
+}
+
+.trans-overlay-resize-handle {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+  background-color: rgba(76, 175, 80, 0.7);
+  border-radius: 0 0 4px 0;
+}
+
+.translation-panel {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 5px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.original-text {
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+.translated-text {
+  font-style: italic;
+}
+
+.language-selector {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(33, 150, 243, 0.6);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.control-button {
+  background-color: rgba(76, 175, 80, 0.7);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.control-button:hover {
+  background-color: rgba(76, 175, 80, 1);
+}
+
+/* Drop area styling */
+.drop-active {
+  background-color: rgba(76, 175, 80, 0.3);
+  border: 2px dashed rgba(76, 175, 80, 1);
+}
