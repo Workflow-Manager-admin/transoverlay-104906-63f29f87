@@ -191,16 +191,21 @@ const TransOverlay = () => {
     if (originalText) {
       const lang = detectLanguage(originalText);
       setDetectedLanguage(lang);
-      const translated = translateText(originalText, lang, selectedLanguage);
-      setTranslatedText(translated);
+      
+      performTranslation(originalText, lang, selectedLanguage)
+        .then(translated => {
+          setTranslatedText(translated);
+        });
     }
   }, [originalText, selectedLanguage]);
   
   // Update translation when detected language changes
   useEffect(() => {
     if (hoveredText && detectedLanguage) {
-      const translated = translateText(hoveredText, detectedLanguage, selectedLanguage);
-      setTranslatedText(translated);
+      performTranslation(hoveredText, detectedLanguage, selectedLanguage)
+        .then(translated => {
+          setTranslatedText(translated);
+        });
     }
   }, [detectedLanguage, selectedLanguage]);
 
