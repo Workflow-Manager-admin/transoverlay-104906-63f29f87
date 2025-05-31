@@ -1,29 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Draggable from 'react-draggable';
+import { Rnd } from 'react-rnd';
+import languageDetect from 'language-detect';
 import './TransOverlay.css';
 
 /**
  * TransOverlay Component - The main container component for the TransOverlay application.
- * This component creates a transparent, draggable overlay that can be positioned
+ * This component creates a transparent, draggable, resizable overlay that can be positioned
  * over any window or text content for real-time translation.
  * 
  * @returns {JSX.Element} The TransOverlay component
  */
 const TransOverlay = () => {
+  // Core positioning and sizing
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [size, setSize] = useState({ width: 400, height: 300 });
-  const [resizing, setResizing] = useState(false);
+  
+  // Text and translation states
   const [originalText, setOriginalText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+  const [hoveredText, setHoveredText] = useState('');
+  const [detectedLanguage, setDetectedLanguage] = useState('');
+  
+  // UI states
   const [selectedLanguage, setSelectedLanguage] = useState('es'); // Default to Spanish
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   
   const overlayRef = useRef(null);
-  const resizeStartPos = useRef({ x: 0, y: 0 });
-  const startSize = useRef({ width: 0, height: 0 });
+  const hoverTimerRef = useRef(null);
 
   // List of supported languages
   const languages = [
+    { code: 'en', name: 'English' },
     { code: 'es', name: 'Spanish' },
     { code: 'fr', name: 'French' },
     { code: 'de', name: 'German' },
@@ -34,57 +43,142 @@ const TransOverlay = () => {
     { code: 'ru', name: 'Russian' },
   ];
 
-  // Simulated translation function - In a real app, this would call a translation API
-  const translateText = (text, targetLang) => {
-    // For demo purposes, we're just appending the language code to the text
-    // In a real application, this would call a translation API
-    return `[${targetLang}] ${text} (translated)`;
+  // Map of language codes used by language-detect to more readable forms
+  const languageCodeMap = {
+    'eng': 'English',
+    'spa': 'Spanish',
+    'fra': 'French',
+    'deu': 'German',
+    'ita': 'Italian',
+    'jpn': 'Japanese',
+    'kor': 'Korean',
+    'zho': 'Chinese',
+    'rus': 'Russian',
   };
 
-  // Handle text change and trigger translation
+  // Function to detect the language of the given text
+  const detectLanguage = (text) => {
+    if (!text || text.trim().length < 3) {
+      return ''; // Not enough text to detect language
+    }
+    
+    try {
+      const detectedCode = languageDetect(text);
+      // Return readable language name if available, otherwise the code
+      return languageCodeMap[detectedCode] || detectedCode || '';
+    } catch (error) {
+      console.error('Error detecting language:', error);
+      return '';
+    }
+  };
+
+  // Simulated translation function - In a real app, this would call a translation API
+  const translateText = (text, sourceLang, targetLang) => {
+    // For demo purposes, we're just appending the language code to the text
+    // In a real application, this would call a translation API
+    if (!text) return '';
+    
+    return `[${sourceLang} → ${targetLang}] ${text} (translated)`;
+  };
+
+  // Extract text from elements under the mouse pointer
+  const extractTextFromPosition = (clientX, clientY) => {
+    if (!isLocked) {
+      // Get all elements at the current mouse position
+      const elements = document.elementsFromPoint(clientX, clientY);
+      
+      // Filter out our own overlay elements
+      const externalElements = elements.filter(el => {
+        return !overlayRef.current?.contains(el);
+      });
+      
+      // Try to extract text content
+      if (externalElements.length > 0) {
+        // Get the text content from the topmost external element
+        let text = '';
+        
+        for (const el of externalElements) {
+          // Skip if this is our own overlay or invisible elements
+          if (el === overlayRef.current || 
+              window.getComputedStyle(el).visibility === 'hidden' ||
+              window.getComputedStyle(el).display === 'none') {
+            continue;
+          }
+          
+          // Try to get text directly
+          const elText = el.innerText || el.textContent;
+          if (elText && elText.trim()) {
+            text = elText.trim();
+            break;
+          }
+        }
+        
+        if (text && text !== hoveredText) {
+          setHoveredText(text);
+          const lang = detectLanguage(text);
+          setDetectedLanguage(lang);
+          
+          // If we have text and detected a language, translate it
+          if (text && lang) {
+            const translated = translateText(text, lang, selectedLanguage);
+            setTranslatedText(translated);
+          }
+        }
+      }
+    }
+  };
+
+  // Debounce the mouse movement to prevent excessive processing
+  const debounce = (func, delay) => {
+    return function(...args) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+
+  // Debounced version of extractTextFromPosition
+  const debouncedExtractText = useRef(
+    debounce((x, y) => extractTextFromPosition(x, y), 300)
+  ).current;
+
+  // Handle mouse movement over the document when in hover mode
+  const handleDocumentMouseMove = (e) => {
+    if (isHovering && !isLocked) {
+      debouncedExtractText(e.clientX, e.clientY);
+    }
+  };
+
+  // Setup and cleanup global mousemove event listener
+  useEffect(() => {
+    if (isHovering) {
+      document.addEventListener('mousemove', handleDocumentMouseMove);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleDocumentMouseMove);
+      clearTimeout(hoverTimerRef.current);
+    };
+  }, [isHovering, isLocked]);
+
+  // Handle manual text input and trigger translation
   useEffect(() => {
     if (originalText) {
-      const translated = translateText(originalText, selectedLanguage);
+      const lang = detectLanguage(originalText);
+      setDetectedLanguage(lang);
+      const translated = translateText(originalText, lang, selectedLanguage);
       setTranslatedText(translated);
     }
   }, [originalText, selectedLanguage]);
-
-  // Handle start of resize operation
-  const handleResizeStart = (e) => {
-    e.preventDefault();
-    setResizing(true);
-    resizeStartPos.current = { x: e.clientX, y: e.clientY };
-    startSize.current = { ...size };
-    
-    // Add event listeners for mouse movement and mouse up
-    document.addEventListener('mousemove', handleResize);
-    document.addEventListener('mouseup', handleResizeEnd);
-  };
-
-  // Handle active resize operation
-  const handleResize = (e) => {
-    if (resizing) {
-      const deltaX = e.clientX - resizeStartPos.current.x;
-      const deltaY = e.clientY - resizeStartPos.current.y;
-      
-      setSize({
-        width: Math.max(200, startSize.current.width + deltaX), // Minimum width of 200px
-        height: Math.max(150, startSize.current.height + deltaY), // Minimum height of 150px
-      });
+  
+  // Update translation when detected language changes
+  useEffect(() => {
+    if (hoveredText && detectedLanguage) {
+      const translated = translateText(hoveredText, detectedLanguage, selectedLanguage);
+      setTranslatedText(translated);
     }
-  };
-
-  // Handle end of resize operation
-  const handleResizeEnd = () => {
-    setResizing(false);
-    document.removeEventListener('mousemove', handleResize);
-    document.removeEventListener('mouseup', handleResizeEnd);
-  };
-
-  // Handle drag end
-  const handleDragEnd = (e, data) => {
-    setPosition({ x: data.x, y: data.y });
-  };
+  }, [detectedLanguage, selectedLanguage]);
 
   // Handle file drag over
   const handleDragOver = (e) => {
@@ -111,6 +205,7 @@ const TransOverlay = () => {
         const reader = new FileReader();
         reader.onload = (event) => {
           setOriginalText(event.target.result);
+          setHoveredText('');
         };
         reader.readAsText(file);
       } else {
@@ -122,6 +217,7 @@ const TransOverlay = () => {
   // Handle text input change
   const handleTextChange = (e) => {
     setOriginalText(e.target.value);
+    setHoveredText('');
   };
 
   // Handle language change
@@ -129,19 +225,44 @@ const TransOverlay = () => {
     setSelectedLanguage(e.target.value);
   };
 
+  // Toggle hover mode
+  const toggleHoverMode = () => {
+    setIsHovering(!isHovering);
+    if (!isHovering) {
+      setHoveredText('');
+      setOriginalText('');
+      setTranslatedText('');
+    }
+  };
+
+  // Toggle lock state
+  const toggleLock = () => {
+    setIsLocked(!isLocked);
+  };
+
   return (
-    <Draggable
-      handle=".trans-overlay-header"
-      position={position}
-      onStop={handleDragEnd}
+    <Rnd
+      size={{ width: size.width, height: size.height }}
+      position={{ x: position.x, y: position.y }}
+      onDragStop={(e, d) => {
+        setPosition({ x: d.x, y: d.y });
+      }}
+      onResize={(e, direction, ref, delta, position) => {
+        setSize({
+          width: ref.offsetWidth,
+          height: ref.offsetHeight,
+        });
+        setPosition(position);
+      }}
+      disableDragging={isLocked}
+      enableResizing={!isLocked}
+      dragHandleClassName="trans-overlay-header"
       bounds="parent"
+      minWidth={200}
+      minHeight={150}
     >
       <div 
-        className="trans-overlay-container"
-        style={{
-          width: `${size.width}px`,
-          height: `${size.height}px`,
-        }}
+        className={`trans-overlay-container ${isLocked ? 'locked' : ''}`}
         ref={overlayRef}
       >
         <div 
@@ -152,11 +273,26 @@ const TransOverlay = () => {
         >
           <div className="trans-overlay-header">
             <span>TransOverlay</span>
-            <div>
+            <div className="header-controls">
+              <button 
+                className={`control-button ${isHovering ? 'active' : ''}`}
+                onClick={toggleHoverMode}
+                title={isHovering ? 'Disable hover mode' : 'Enable hover mode'}
+              >
+                {isHovering ? 'Hover: On' : 'Hover: Off'}
+              </button>
+              <button 
+                className={`control-button ${isLocked ? 'active' : ''}`}
+                onClick={toggleLock}
+                title={isLocked ? 'Unlock overlay (enable drag/resize)' : 'Lock overlay (click-through mode)'}
+              >
+                {isLocked ? 'Unlock' : 'Lock'}
+              </button>
               <select 
                 className="language-selector" 
                 value={selectedLanguage} 
                 onChange={handleLanguageChange}
+                title="Select target language"
               >
                 {languages.map((lang) => (
                   <option key={lang.code} value={lang.code}>
@@ -168,56 +304,84 @@ const TransOverlay = () => {
           </div>
           
           <div className="trans-overlay-body">
-            <textarea 
-              placeholder="Type or drop text here for translation..."
-              value={originalText}
-              onChange={handleTextChange}
-              style={{
-                width: '100%',
-                minHeight: '80px',
-                padding: '8px',
-                borderRadius: '4px',
-                border: '1px solid rgba(33, 150, 243, 0.3)',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                marginBottom: '10px',
-              }}
-            />
+            {!isHovering && (
+              <textarea 
+                placeholder="Type or drop text here for translation..."
+                value={originalText}
+                onChange={handleTextChange}
+                style={{
+                  width: '100%',
+                  minHeight: '80px',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(33, 150, 243, 0.3)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  marginBottom: '10px',
+                }}
+              />
+            )}
+            
+            {isHovering && hoveredText && (
+              <div className="hover-info">
+                <div className="hover-text">
+                  <strong>Hovering over:</strong> {hoveredText.length > 50 ? `${hoveredText.substring(0, 50)}...` : hoveredText}
+                </div>
+                {detectedLanguage && (
+                  <div className="detected-language">
+                    <strong>Detected language:</strong> {detectedLanguage}
+                  </div>
+                )}
+              </div>
+            )}
             
             {translatedText && (
               <div className="translation-panel">
-                <div className="original-text">{originalText}</div>
+                <div className="original-text">
+                  {isHovering ? hoveredText : originalText}
+                </div>
                 <div className="translated-text">{translatedText}</div>
               </div>
             )}
             
-            <p style={{ color: 'white', fontSize: '12px', textAlign: 'center', margin: '5px 0' }}>
-              {isDragOver 
-                ? 'Drop text file here' 
-                : 'Drag and drop a text file or type directly above'}
-            </p>
+            {!isHovering && (
+              <p style={{ color: 'white', fontSize: '12px', textAlign: 'center', margin: '5px 0' }}>
+                {isDragOver 
+                  ? 'Drop text file here' 
+                  : 'Drag and drop a text file or type directly above'}
+              </p>
+            )}
+            
+            {isHovering && !hoveredText && (
+              <p style={{ color: 'white', fontSize: '12px', textAlign: 'center', margin: '5px 0' }}>
+                Move mouse over text to translate
+              </p>
+            )}
           </div>
           
           <div className="trans-overlay-footer">
             <div>
               <span style={{ fontSize: '12px', color: 'white' }}>
-                Selected: {languages.find(lang => lang.code === selectedLanguage)?.name}
+                {isHovering ? 
+                  `${detectedLanguage ? `From: ${detectedLanguage}` : 'Hover over text'} → To: ${languages.find(lang => lang.code === selectedLanguage)?.name}` :
+                  `Selected: ${languages.find(lang => lang.code === selectedLanguage)?.name}`}
               </span>
             </div>
             <div>
-              <button className="control-button" onClick={() => setOriginalText('')}>
+              <button 
+                className="control-button" 
+                onClick={() => {
+                  setOriginalText('');
+                  setHoveredText('');
+                  setTranslatedText('');
+                }}
+              >
                 Clear
               </button>
             </div>
           </div>
-          
-          {/* Resize handle */}
-          <div 
-            className="trans-overlay-resize-handle"
-            onMouseDown={handleResizeStart}
-          />
         </div>
       </div>
-    </Draggable>
+    </Rnd>
   );
 };
 
