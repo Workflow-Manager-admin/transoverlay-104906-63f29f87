@@ -16,15 +16,17 @@ jest.mock('react-rnd', () => {
   };
 });
 
-// Mock language-detect
-jest.mock('language-detect', () => {
-  return jest.fn().mockImplementation((text) => {
-    // Simple mock implementation
-    if (text.includes('hello')) return 'eng';
-    if (text.includes('hola')) return 'spa';
-    if (text.includes('bonjour')) return 'fra';
-    return 'eng'; // Default to English
-  });
+// Mock franc-min
+jest.mock('franc-min', () => {
+  return {
+    franc: jest.fn().mockImplementation((text) => {
+      // Simple mock implementation
+      if (text.includes('hello')) return 'eng';
+      if (text.includes('hola')) return 'spa';
+      if (text.includes('bonjour')) return 'fra';
+      return 'eng'; // Default to English
+    })
+  };
 });
 
 // Mock document.elementsFromPoint
